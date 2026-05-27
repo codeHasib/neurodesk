@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient, useSession } from "@/lib/auth-client";
@@ -18,8 +18,13 @@ import {
   RiAddBoxFill,
   RiTeamFill,
   RiSuitcase2Fill,
+  RiUserLine,
+  RiShutDownLine,
+  RiCompass3Line,
+  RiShieldCheckLine,
 } from "react-icons/ri";
 import ThemeToggle from "../ui/ThemeToggle";
+import { AnimatePresence, motion } from "motion/react";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -28,8 +33,12 @@ interface AppLayoutProps {
 const AppLayout = ({ children }: AppLayoutProps) => {
   const pathname = usePathname();
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
 
   const { data, isPending } = useSession();
+
+  // Extract first letter safely
+  const userInitial = data?.user?.name ? data.user.name[0].toUpperCase() : "U";
   const menuItems = [
     {
       name: "Dashboard",
@@ -175,7 +184,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         </div>
 
         {/* Mobile Dropdown Avatar Menu */}
-        <div className="flex justify-center items-center gap-2">
+        {/* <div className="flex justify-center items-center gap-2">
           <div>
             <ThemeToggle></ThemeToggle>
           </div>
@@ -220,6 +229,147 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                 </button>
               </li>
             </ul>
+          </div>
+        </div> */}
+        <div className="flex justify-center items-center gap-4">
+          {/* Theme Toggle Wrapper */}
+          <div className="hover:scale-105 transition-transform duration-200">
+            <ThemeToggle />
+          </div>
+
+          {/* Interactive Dropdown Module */}
+          <div className="relative">
+            {/* Trigger Avatar Button */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              disabled={isPending}
+              className={`relative flex items-center justify-center rounded-full transition-all duration-300 focus:outline-none group ${
+                isOpen
+                  ? "ring-2 ring-primary ring-offset-2 ring-offset-black scale-95"
+                  : "hover:scale-105"
+              }`}
+              style={{ width: "36px", height: "36px" }}
+            >
+              {/* Subtle Dynamic Ping Aura */}
+              <span className="absolute inset-0 rounded-full bg-primary/20 opacity-0 group-hover:opacity-100 group-hover:animate-ping transition-opacity duration-300 pointer-events-none" />
+
+              {/* Avatar Base */}
+              <div className="w-full h-full rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center font-mono font-black text-xs text-white shadow-lg overflow-hidden">
+                {isPending ? (
+                  <span className="loading loading-spinner loading-xs text-primary"></span>
+                ) : (
+                  <span className="relative z-10 text-slate-200 group-hover:text-primary transition-colors">
+                    {userInitial}
+                  </span>
+                )}
+              </div>
+
+              {/* Online Connection Pill */}
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-black rounded-full" />
+            </button>
+
+            {/* Animated Popout Console */}
+            <AnimatePresence>
+              {isOpen && (
+                <>
+                  {/* Invisible Click Overlay to Close */}
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsOpen(false)}
+                  />
+
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 8 }}
+                    transition={{ duration: 0.15, ease: "easeOut" }}
+                    className="absolute right-0 mt-3 w-60 bg-[#09090b] border border-slate-900 rounded-2xl shadow-2xl z-50 p-2 overflow-hidden backdrop-blur-xl"
+                  >
+                    {/* Header User Identity Module */}
+                    <div className="px-3 py-3 mb-2 bg-slate-950/60 border border-slate-900/40 rounded-xl flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary/5 border border-primary/20 flex items-center justify-center text-primary font-mono font-bold text-xs">
+                        {userInitial}
+                      </div>
+                      <div className="space-y-0.5 min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                          Authenticated Node
+                        </p>
+                        <h4 className="text-xs font-bold text-white truncate italic uppercase tracking-tight">
+                          {data?.user?.name || "System_User"}
+                        </h4>
+                      </div>
+                    </div>
+
+                    {/* Main Dynamic Operations Menu Items */}
+                    <ul className="space-y-0.5 text-xs font-medium text-slate-400">
+                      <div className="px-3 py-1.5 text-[9px] font-mono tracking-[0.2em] uppercase text-slate-600 flex items-center gap-1.5">
+                        <RiCompass3Line /> Navigation
+                      </div>
+
+                      {menuItems?.map((item: any) => (
+                        <li key={item.name}>
+                          <Link
+                            href={item.href}
+                            onClick={() => setIsOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-900 hover:text-white transition-all group"
+                          >
+                            <RiUserLine
+                              size={14}
+                              className="text-slate-600 group-hover:text-primary transition-colors"
+                            />
+                            <span className="font-mono text-[11px] uppercase tracking-wider">
+                              {item.name}
+                            </span>
+                          </Link>
+                        </li>
+                      ))}
+
+                      <div className="h-[1px] bg-slate-900/60 my-2 mx-2" />
+
+                      <div className="px-3 py-1.5 text-[9px] font-mono tracking-[0.2em] uppercase text-slate-600 flex items-center gap-1.5">
+                        <RiShieldCheckLine /> System_Core
+                      </div>
+
+                      {/* Settings Node */}
+                      <li>
+                        <Link
+                          href="/settings"
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-900 hover:text-white transition-all group"
+                        >
+                          <RiSettings3Line
+                            size={14}
+                            className="text-slate-600 group-hover:text-white transition-colors"
+                          />
+                          <span className="font-mono text-[11px] uppercase tracking-wider">
+                            Settings
+                          </span>
+                        </Link>
+                      </li>
+
+                      {/* Logout Directive Trigger */}
+                      <li>
+                        <button
+                          onClick={() => {
+                            setIsOpen(false);
+                            handleSignOut();
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-950/20 text-slate-500 hover:text-red-400 border border-transparent hover:border-red-900/30 transition-all group text-left"
+                        >
+                          <RiShutDownLine
+                            size={14}
+                            className="text-slate-600 group-hover:text-red-400 transition-colors"
+                          />
+                          <span className="font-mono text-[11px] uppercase tracking-wider font-bold">
+                            Terminate_Session
+                          </span>
+                        </button>
+                      </li>
+                    </ul>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </header>
