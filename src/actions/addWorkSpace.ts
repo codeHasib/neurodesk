@@ -2,6 +2,7 @@ import { verifyToken } from "@/lib/api-verify";
 import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { Workspace } from "@/model/workspace.model";
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
 export const addWorkspace = async (req: Request) => {
@@ -17,5 +18,6 @@ export const addWorkspace = async (req: Request) => {
   const body = await req.json();
 
   const newWorkspace = await Workspace.create({ ...body, ownerId: ownerId });
+  revalidatePath(`/dashboard/tasks`);
   return new Response(JSON.stringify(newWorkspace), { status: 201 });
 };

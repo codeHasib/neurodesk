@@ -23,19 +23,3 @@ export const POST = async (req: Request) => {
     return new Response("Failed to create task", { status: 500 });
   }
 };
-
-export const GET = async (req: Request) => {
-  try {
-    const { token } = await auth.api.getToken({
-      headers: await headers(),
-    });
-    if (!token) {
-      return new Response("Unauthorized", { status: 401 });
-    }
-    const user = await verifyToken(token);
-    console.log(user.id);
-  } catch (error) {
-    console.error("Error occurred while posting task:", error);
-    return new Response("Failed to create task", { status: 500 });
-  }
-};
