@@ -17,6 +17,10 @@ const taskSchema = new Schema({
     type: String,
     required: true,
   },
+  ownerId: {
+    type: String,
+    required: true,
+  },
   status: {
     type: String,
     required: true,

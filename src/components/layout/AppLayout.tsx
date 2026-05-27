@@ -16,6 +16,7 @@ import {
   RiSparklingLine,
   RiAddFill,
   RiAddBoxFill,
+  RiTeamFill,
 } from "react-icons/ri";
 import ThemeToggle from "../ui/ThemeToggle";
 
@@ -28,19 +29,13 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const router = useRouter();
 
   const { data, isPending } = useSession();
-  if (isPending) {
-    console.log("wait");
-  } else {
-    console.log(data?.user);
-  }
-
   const menuItems = [
     {
       name: "Dashboard",
       href: "/dashboard",
       icon: <RiLayoutGridLine size={22} />,
     },
-    { name: "Tasks", href: "/tasks", icon: <RiTaskLine size={22} /> },
+    { name: "Tasks", href: "/dashboard/tasks", icon: <RiTaskLine size={22} /> },
     {
       name: "AI Planner",
       href: "/planner",
@@ -48,18 +43,23 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     },
     {
       name: "Calendar",
-      href: "/calendar",
+      href: "/dashboard/calendar",
       icon: <RiCalendarTodoLine size={22} />,
     },
     {
       name: "Add Tasks",
-      href: "/add-tasks",
+      href: "/dashboard/add-tasks",
       icon: <RiAddFill size={22} />,
     },
     {
       name: "Add Projects",
-      href: "/add-projects",
+      href: "/dashboard/add-projects",
       icon: <RiAddBoxFill size={22} />,
+    },
+    {
+      name: "Add Workspace",
+      href: "/dashboard/add-workspace",
+      icon: <RiTeamFill size={22} />,
     },
   ];
 
