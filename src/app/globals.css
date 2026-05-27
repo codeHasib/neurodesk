@@ -1,2 +1,10 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  /* Load the themes you want to support directly inside the plugin directive */
+  themes: light, dark;
+}
+
+@theme {
+  /* Tells Tailwind to monitor the data-theme attribute injected by next-themes */
+  --variant-dark: selector([data-theme="dark"]);
+}
