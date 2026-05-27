@@ -11,6 +11,7 @@ import {
   RiFileList3Line,
 } from "react-icons/ri";
 import { useSession } from "@/lib/auth-client";
+import { redirect } from "next/navigation";
 
 // Animation Variants for Container Parent-Child relationships (Staggering)
 const containerVariants = {

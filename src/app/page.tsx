@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import {
   RiSparklingLine,
   RiLayoutGridLine,
@@ -12,12 +12,21 @@ import {
   RiCheckLine,
   RiGithubFill,
 } from "react-icons/ri";
-import { authClient } from "@/lib/auth-client";
+import { authClient, useSession } from "@/lib/auth-client";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export default function LandingPage() {
   const [demoLoading, setDemoLoading] = useState(false);
   const router = useRouter();
+  const { data, isPending } = useSession();
+
+  if (!isPending) {
+    if (data) {
+      redirect("/dashboard");
+    }
+  } else {
+    // Show loading state or skeleton
+  }
 
   // Quick portfolio trick: Log them into a guest state or push straight to dashboard
   const handleGuestLogin = async () => {

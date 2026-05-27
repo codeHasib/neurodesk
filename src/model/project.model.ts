@@ -11,6 +11,9 @@ const projectSchema = new Schema({
   },
   color: {
     type: String,
+  },
+  ownerId: {
+    type: String,
     required: true,
   },
   description: {

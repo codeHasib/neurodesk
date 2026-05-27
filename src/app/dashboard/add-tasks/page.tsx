@@ -18,6 +18,31 @@ const AddTaskPage = () => {
   const router = useRouter();
   const [session, setSession] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
+  const [workSpaces, setWorkSpaces] = useState<unknown[]>([]);
+  const [projects, setProjects] = useState<unknown[]>([]);
+
+  useEffect(() => {
+    const fetchWorkspaces = async () => {
+      try {
+        const response = await axios.get("/api/get-workspace");
+        setWorkSpaces(response.data);
+      } catch (error) {
+        console.error("Error fetching workspaces:", error);
+      }
+    };
+
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get("/api/get-project");
+        setProjects(response.data);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+
+    fetchWorkspaces();
+    fetchProjects();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -148,8 +173,11 @@ const AddTaskPage = () => {
                     <option value="" disabled>
                       Select Workspace
                     </option>
-                    <option value="ws_1">Main Workspace</option>
-                    <option value="ws_2">Personal Labs</option>
+                    {workSpaces.map((item) => (
+                      <option key={item?._id} value={item?._id}>
+                        {item?.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -170,8 +198,11 @@ const AddTaskPage = () => {
                     <option value="" disabled>
                       Assign Project
                     </option>
-                    <option value="p_1">NeuroDesk SaaS</option>
-                    <option value="p_2">E-commerce API</option>
+                    {projects.map((item) => (
+                      <option key={item._id} value={item._id}>
+                        {item.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
