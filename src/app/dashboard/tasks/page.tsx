@@ -288,7 +288,9 @@ const AllTasksPage = () => {
                     {/* Right: Surgical Control Directives */}
                     <div className="flex items-center gap-2 w-full md:w-auto justify-end border-t border-slate-900 md:border-none pt-4 md:pt-0 shrink-0">
                       <button
-                        onClick={() => router.push(`/tasks/edit/${task._id}`)}
+                        onClick={() =>
+                          router.push(`/dashboard/edit-task/${task._id}`)
+                        }
                         className="btn bg-slate-900/40 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-600 h-10 w-10 p-0 rounded-lg transition-all"
                         title="Modify Task Schema"
                       >
