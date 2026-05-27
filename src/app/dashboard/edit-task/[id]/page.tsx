@@ -59,7 +59,7 @@ const EditTaskPage = () => {
         // Seed initial filtered projects based on the task's current workspace
         setFilteredProjects(
           projRes.data.filter(
-            (p: any) => p.workSpaceId === currentTask.workSpaceId,
+            (p: unknown) => p.workSpaceId === currentTask.workSpaceId,
           ),
         );
       } catch (err) {

@@ -17,6 +17,7 @@ import {
   RiAddFill,
   RiAddBoxFill,
   RiTeamFill,
+  RiSuitcase2Fill,
 } from "react-icons/ri";
 import ThemeToggle from "../ui/ThemeToggle";
 
@@ -36,6 +37,11 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       icon: <RiLayoutGridLine size={22} />,
     },
     { name: "Tasks", href: "/dashboard/tasks", icon: <RiTaskLine size={22} /> },
+    {
+      name: "Projects",
+      href: "/dashboard/projects",
+      icon: <RiSuitcase2Fill size={22} />,
+    },
     {
       name: "AI Planner",
       href: "/planner",
