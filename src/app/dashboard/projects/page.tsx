@@ -79,7 +79,7 @@ const AllProjectsPage = () => {
 
   if (loading)
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center bg-black">
+      <div className="min-h-[70vh] flex flex-col items-center justify-center">
         <span className="loading loading-ring loading-lg text-primary"></span>
         <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-4">
           Indexing Deployed Nodes...
@@ -88,12 +88,12 @@ const AllProjectsPage = () => {
     );
 
   return (
-    <div className="min-h-screen bg-black text-slate-200 p-4 lg:p-10">
+    <div className="min-h-screen p-4 lg:p-10">
       <div className="max-w-7xl mx-auto space-y-10">
         {/* Header Directive */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-slate-900 pb-8">
           <div>
-            <h1 className="text-4xl font-black italic tracking-tighter text-white uppercase">
+            <h1 className="text-4xl font-black italic tracking-tighter uppercase">
               Project_Architecture
             </h1>
             <p className="text-slate-500 text-xs font-mono mt-2 flex items-center gap-2">

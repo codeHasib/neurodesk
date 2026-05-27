@@ -92,13 +92,13 @@ const EditTaskPage = () => {
 
   if (loading)
     return (
-      <div className="min-h-[80vh] flex items-center justify-center bg-black">
+      <div className="min-h-[80vh] flex items-center justify-center">
         <span className="loading loading-ring loading-lg text-primary"></span>
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-black text-slate-200 p-4 lg:p-12">
+    <div className="min-h-screen text-slate-200 p-4 lg:p-12">
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

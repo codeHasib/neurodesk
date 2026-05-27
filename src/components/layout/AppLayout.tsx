@@ -43,6 +43,11 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       icon: <RiSuitcase2Fill size={22} />,
     },
     {
+      name: "Workspace",
+      href: "/dashboard/workspaces",
+      icon: <RiHomeOfficeLine size={22} />,
+    },
+    {
       name: "AI Planner",
       href: "/planner",
       icon: <RiSparklingLine size={22} />,

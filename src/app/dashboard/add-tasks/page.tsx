@@ -68,7 +68,7 @@ const AddTaskPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-slate-200 selection:bg-primary selection:text-white p-4 lg:p-8">
+    <div className="min-h-screen selection:bg-primary selection:text-white p-4 lg:p-8">
       <motion.div
         initial={{ opacity: 0, scale: 0.98, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}

@@ -161,7 +161,7 @@ const AllTasksPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-3 bg-black">
+      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-3black">
         <span className="loading loading-ring loading-lg text-primary"></span>
         <p className="text-[10px] font-mono text-slate-500 uppercase tracking-[0.2em]">
           Syncing operational matrix...
@@ -171,12 +171,12 @@ const AllTasksPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-slate-200 p-4 lg:p-8">
+    <div className="min-h-screen p-4 lg:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header Block */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-900 pb-6">
           <div>
-            <h1 className="text-3xl font-black italic tracking-tighter text-white uppercase">
+            <h1 className="text-3xl font-black italic tracking-tighter  uppercase">
               Execution_Queue
             </h1>
             <p className="text-slate-500 text-xs font-mono tracking-wider mt-1">
