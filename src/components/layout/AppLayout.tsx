@@ -14,6 +14,8 @@ import {
   RiSearch2Line,
   RiLogoutBoxRLine,
   RiSparklingLine,
+  RiAddFill,
+  RiAddBoxFill,
 } from "react-icons/ri";
 import ThemeToggle from "../ui/ThemeToggle";
 
@@ -48,6 +50,16 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       name: "Calendar",
       href: "/calendar",
       icon: <RiCalendarTodoLine size={22} />,
+    },
+    {
+      name: "Add Tasks",
+      href: "/add-tasks",
+      icon: <RiAddFill size={22} />,
+    },
+    {
+      name: "Add Projects",
+      href: "/add-projects",
+      icon: <RiAddBoxFill size={22} />,
     },
   ];
 
@@ -84,7 +96,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             <RiSearch2Line size={16} />
             <span>Search workspace...</span>
             <kbd className="kbd kbd-xs absolute right-2 bg-base-100 text-[10px]">
-              ⌘K
+              ⌘ K
             </kbd>
           </button>
         </div>

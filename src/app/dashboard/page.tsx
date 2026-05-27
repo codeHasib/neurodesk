@@ -10,6 +10,7 @@ import {
   RiArrowRightUpLine,
   RiFileList3Line,
 } from "react-icons/ri";
+import { useSession } from "@/lib/auth-client";
 
 // Animation Variants for Container Parent-Child relationships (Staggering)
 const containerVariants = {
@@ -54,6 +55,8 @@ const DashboardPage = () => {
     },
   ];
 
+  const { data, isPending } = useSession();
+
   return (
     <motion.div
       variants={containerVariants}
@@ -70,7 +73,7 @@ const DashboardPage = () => {
       >
         <div>
           <h1 className="text-3xl font-black tracking-tight">
-            Welcome back, Developer
+            Welcome back, <span className="uppercase">{data?.user.name}</span>
           </h1>
           <p className="text-base-content/60 text-sm mt-1">
             Here is your localized neural network status today.
