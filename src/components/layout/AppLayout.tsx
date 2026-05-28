@@ -83,8 +83,20 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   ];
 
   const handleSignOut = async () => {
-    await authClient.signOut();
-    redirect("/"); // Ensure redirection happens even if onSuccess callback is missed
+    try {
+      await authClient.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            // Hard redirect to home ensures a fresh state
+            window.location.href = "/";
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Sign out failed", error);
+      // Fallback if the authClient fails for some reason
+      window.location.href = "/";
+    }
   };
 
   return (
