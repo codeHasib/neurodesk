@@ -32,10 +32,7 @@ interface AppLayoutProps {
 
 const AppLayout = ({ children }: AppLayoutProps) => {
   const pathname = usePathname();
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const { data, isPending } = useSession();
 
@@ -86,9 +83,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   ];
 
   const handleSignOut = async () => {
-    await authClient.signOut({
-      fetchOptions: { onSuccess: () => router.push("/") },
-    });
+    await authClient.signOut();
     redirect("/"); // Ensure redirection happens even if onSuccess callback is missed
   };
 
