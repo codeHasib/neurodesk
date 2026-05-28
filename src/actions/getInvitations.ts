@@ -14,7 +14,7 @@ export const getMyInvitations = async () => {
 
     if (!token) {
       console.warn("INVITE_FETCH: No token found");
-      return [];
+      return []; 
     }
 
     const user = await verifyToken(token);
