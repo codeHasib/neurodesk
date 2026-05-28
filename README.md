@@ -4,7 +4,13 @@ An elite, full-stack **AI-augmented productivity workspace** engineered with a *
 
 NeuroDesk unifies granular workspace orchestration, multi-layered project tracking, intelligent notification pipelines, and contextual AI strategy generation into a single high-performance dashboard.
 
----
+## 🌐 Live Demo
+
+Experience NeuroDesk live:
+
+🚀 **Production Deployment:**
+[NeuroDesk Live App](https://neurodesk-ten.vercel.app/?utm_source=chatgpt.com)
+
 
 ## ⚡ Core Features
 
@@ -91,7 +97,7 @@ components/
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/your-username/neurodesk.git
+git clone https://github.com/codeHasib/neurodesk
 cd neurodesk
 ```
 
@@ -107,11 +113,6 @@ MONGODB_URI=your_mongodb_connection_string
 BETTER_AUTH_SECRET=your_auth_secret_key
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-# Email Service
-SMTP_HOST=your_smtp_host
-SMTP_PORT=your_smtp_port
-SMTP_USER=your_smtp_user
-SMTP_PASS=your_smtp_password
 ```
 
 ---
