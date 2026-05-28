@@ -9,7 +9,6 @@ import {
   RiLayout4Line,
   RiArrowLeftLine,
   RiCheckboxCircleLine,
-  RiFlashlightLine,
   RiUserReceived2Line,
 } from "react-icons/ri";
 import axios from "axios";
@@ -21,14 +20,14 @@ const AddTaskPage = () => {
   const [workSpaces, setWorkSpaces] = useState<any[]>([]);
   const [allProjects, setAllProjects] = useState<any[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<any[]>([]);
-  const [currentMembers, setCurrentMembers] = useState<any[]>([]); // New State
+  const [currentMembers, setCurrentMembers] = useState<any[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     projectId: "",
     workSpaceId: "",
-    assignedTo: "", // New Field
+    assignedTo: "",
     status: "todo",
   });
 
@@ -39,8 +38,8 @@ const AddTaskPage = () => {
           axios.get("/api/get-workspace"),
           axios.get("/api/get-project"),
         ]);
-        setWorkSpaces(wsRes.data?.workspaces);
-        setAllProjects(projRes.data);
+        setWorkSpaces(wsRes.data?.workspaces || []);
+        setAllProjects(projRes.data || []);
       } catch (err) {
         console.error("Context fetch failed", err);
       } finally {
@@ -59,7 +58,7 @@ const AddTaskPage = () => {
       assignedTo: "",
     });
     setFilteredProjects(allProjects.filter((p) => p.workSpaceId === wsId));
-    setCurrentMembers(selectedWs?.members || []); // Update available members
+    setCurrentMembers(selectedWs?.members || []);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,207 +74,195 @@ const AddTaskPage = () => {
     }
   };
 
+  if (loading)
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <span className="loading loading-spinner loading-md text-primary"></span>
+      </div>
+    );
+
   return (
-    <div className="min-h-screen selection:bg-primary selection:text-white p-4 lg:p-8">
+    <div className="min-h-screen p-4 lg:p-10">
       <motion.div
-        initial={{ opacity: 0, scale: 0.98, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="max-w-4xl mx-auto"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-2xl mx-auto"
       >
-        <div className="flex items-center justify-between mb-12">
-          <button
-            onClick={() => router.back()}
-            className="group flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-slate-500 hover:text-primary transition-all"
-          >
-            <RiArrowLeftLine className="group-hover:-translate-x-1 transition-transform" />
-            Terminal / Root
-          </button>
-          <div className="flex items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-800 rounded-full text-[10px] font-mono text-slate-500">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-            System Live
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          <div>
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-primary transition-colors mb-2"
+            >
+              <RiArrowLeftLine /> Back to Dashboard
+            </button>
+            <h1 className="text-2xl font-bold text-white tracking-tight">
+              Create New Task
+            </h1>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-[2rem] blur-2xl opacity-20 group-focus-within:opacity-40 transition-opacity duration-700"></div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="bg-[#0d0d0d] border border-slate-900 rounded-3xl p-6 lg:p-8 space-y-6 shadow-xl">
+            {/* Task Title */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">
+                Task Name
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="What needs to be done?"
+                className="w-full bg-black border border-slate-900 focus:border-primary rounded-xl p-4 text-sm font-medium text-white transition-all outline-none"
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
+              />
+            </div>
 
-          <div className="relative bg-[#0d0d0d] border border-slate-800 rounded-[2rem] overflow-hidden shadow-2xl">
-            <div className="h-1 bg-gradient-to-r from-primary via-secondary to-primary opacity-50"></div>
-
-            <div className="p-8 lg:p-12 space-y-10">
-              <div className="flex items-start justify-between border-b border-slate-800/50 pb-8">
-                <div>
-                  <h1 className="text-4xl font-black italic tracking-tighter text-white">
-                    Deploy Task
-                  </h1>
-                  <p className="text-slate-500 font-medium mt-1">
-                    Specify a new execution unit for the core system.
-                  </p>
-                </div>
-                <div className="p-4 bg-slate-900 rounded-2xl border border-slate-800 shadow-inner">
-                  <RiFlashlightLine size={28} className="text-primary" />
-                </div>
-              </div>
-
-              <div className="space-y-8">
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/80 flex items-center gap-2">
-                    <RiCheckboxCircleLine /> Subject
-                  </label>
-                  <input
-                    type="text"
+            {/* Selectors Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">
+                  Workspace
+                </label>
+                <div className="relative">
+                  <RiLayout4Line className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" />
+                  <select
+                    className="select w-full pl-11 bg-black border-slate-900 focus:border-primary rounded-xl text-xs font-bold h-12 outline-none"
+                    value={formData.workSpaceId}
+                    onChange={(e) => handleWorkspaceChange(e.target.value)}
                     required
-                    placeholder="Task identity..."
-                    className="w-full bg-transparent text-sm font-bold placeholder:text-slate-800 focus:ring-0 p-4 rounded-full text-white transition-all border border-slate-800 focus:border-primary"
-                    value={formData.title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">
-                      Context Workspace
-                    </label>
-                    <div className="relative group/select">
-                      <RiLayout4Line className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within/select:text-primary transition-colors" />
-                      <select
-                        className="select w-full pl-12 bg-slate-900/50 border-slate-800 focus:border-primary rounded-xl text-sm font-semibold h-14"
-                        value={formData.workSpaceId}
-                        onChange={(e) => handleWorkspaceChange(e.target.value)}
-                        required
-                      >
-                        <option value="" disabled>
-                          Select Node
-                        </option>
-                        {workSpaces.map((ws) => (
-                          <option key={ws._id} value={ws._id}>
-                            {ws.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">
-                      Target Project
-                    </label>
-                    <div className="relative group/select">
-                      <RiFolderLine className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within/select:text-primary transition-colors" />
-                      <select
-                        className="select w-full pl-12 bg-slate-900/50 border-slate-800 focus:border-primary rounded-xl text-sm font-semibold h-14"
-                        value={formData.projectId}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            projectId: e.target.value,
-                          })
-                        }
-                        disabled={!formData.workSpaceId}
-                        required
-                      >
-                        <option value="" disabled>
-                          {formData.workSpaceId
-                            ? "Choose Mission"
-                            : "Unlock Workspace First"}
-                        </option>
-                        {filteredProjects.map((p) => (
-                          <option key={p._id} value={p._id}>
-                            {p.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* NEW ASSIGNEE SELECTOR */}
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">
-                    Assign Agent
-                  </label>
-                  <div className="relative group/select">
-                    <RiUserReceived2Line className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within/select:text-primary transition-colors" />
-                    <select
-                      className="select w-full pl-12 bg-slate-900/50 border-slate-800 focus:border-primary rounded-xl text-sm font-semibold h-14"
-                      value={formData.assignedTo}
-                      onChange={(e) =>
-                        setFormData({ ...formData, assignedTo: e.target.value })
-                      }
-                      disabled={!formData.workSpaceId}
-                    >
-                      <option value="">Unassigned (Backlog)</option>
-                      {currentMembers.map((member) => (
-                        <option key={member.userId} value={member.userId}>
-                          {member.email} ({member.role})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">
-                    Documentation
-                  </label>
-                  <textarea
-                    required
-                    placeholder="Provide technical scope and requirements..."
-                    className="textarea w-full bg-slate-900/30 border-slate-800 focus:border-primary/50 min-h-[180px] rounded-2xl p-6 font-mono text-sm leading-relaxed placeholder:text-slate-800 transition-all resize-none"
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">
-                    Execution Phase
-                  </label>
-                  <div className="flex flex-wrap gap-3">
-                    {["todo", "in-progress", "review", "completed"].map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, status: s })}
-                        className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-                          formData.status === s
-                            ? "bg-primary text-white shadow-[0_0_20px_rgba(var(--p),0.4)]"
-                            : "bg-slate-900 text-slate-500 border border-slate-800 hover:border-slate-600"
-                        }`}
-                      >
-                        {s.replace("-", " ")}
-                      </button>
+                  >
+                    <option value="" disabled>
+                      Select Workspace
+                    </option>
+                    {workSpaces.map((ws) => (
+                      <option key={ws._id} value={ws._id}>
+                        {ws.name}
+                      </option>
                     ))}
-                  </div>
+                  </select>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-800/50">
-                <button
-                  type="submit"
-                  disabled={isSubmitting || !formData.projectId}
-                  className="btn btn-primary flex-1 h-16 rounded-2xl text-lg font-black italic tracking-widest shadow-2xl active:scale-[0.98] transition-transform disabled:opacity-30"
-                >
-                  {isSubmitting ? (
-                    <span className="loading loading-ring"></span>
-                  ) : (
-                    "EXECUTE_DEPLOYMENT"
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => router.back()}
-                  className="btn btn-ghost h-16 px-10 rounded-2xl text-slate-500 font-bold hover:bg-red-500/10 hover:text-red-500 transition-all border border-transparent hover:border-red-500/20"
-                >
-                  DISCARD
-                </button>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">
+                  Project
+                </label>
+                <div className="relative">
+                  <RiFolderLine className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" />
+                  <select
+                    className="select w-full pl-11 bg-black border-slate-900 focus:border-primary rounded-xl text-xs font-bold h-12 outline-none"
+                    value={formData.projectId}
+                    onChange={(e) =>
+                      setFormData({ ...formData, projectId: e.target.value })
+                    }
+                    disabled={!formData.workSpaceId}
+                    required
+                  >
+                    <option value="" disabled>
+                      {formData.workSpaceId
+                        ? "Select Project"
+                        : "Pick Workspace First"}
+                    </option>
+                    {filteredProjects.map((p) => (
+                      <option key={p._id} value={p._id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
+
+            {/* Assignee */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">
+                Assign To
+              </label>
+              <div className="relative">
+                <RiUserReceived2Line className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" />
+                <select
+                  className="select w-full pl-11 bg-black border-slate-900 focus:border-primary rounded-xl text-xs font-bold h-12 outline-none"
+                  value={formData.assignedTo}
+                  onChange={(e) =>
+                    setFormData({ ...formData, assignedTo: e.target.value })
+                  }
+                  disabled={!formData.workSpaceId}
+                >
+                  <option value="">Unassigned</option>
+                  {currentMembers.map((member) => (
+                    <option key={member.userId} value={member.userId}>
+                      {member.email}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">
+                Description
+              </label>
+              <textarea
+                required
+                placeholder="Provide task details..."
+                className="textarea w-full bg-black border-slate-900 focus:border-primary min-h-[120px] rounded-xl p-4 text-sm leading-relaxed text-white transition-all outline-none resize-none"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+              />
+            </div>
+
+            {/* Status Tabs */}
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">
+                Initial Status
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {["todo", "in-progress", "review", "completed"].map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, status: s })}
+                    className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${
+                      formData.status === s
+                        ? "bg-primary border-primary text-white shadow-lg"
+                        : "bg-black text-slate-500 border-slate-900 hover:border-slate-700"
+                    }`}
+                  >
+                    {s.replace("-", " ")}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Form Actions */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              type="submit"
+              disabled={isSubmitting || !formData.projectId}
+              className="btn btn-primary py-4 flex-1 h-14 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-20"
+            >
+              {isSubmitting ? (
+                <span className="loading loading-spinner"></span>
+              ) : (
+                "Create Task"
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="btn btn-ghost h-14 px-8 rounded-2xl text-slate-500 font-bold text-xs uppercase tracking-widest border border-slate-900 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20"
+            >
+              Cancel
+            </button>
           </div>
         </form>
       </motion.div>
