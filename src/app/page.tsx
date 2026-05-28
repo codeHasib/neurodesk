@@ -159,7 +159,7 @@ export default function LandingPage() {
          ========================================== */}
       <section
         id="features"
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-base-300"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-base-300 scroll-smooth"
       >
         <div className="text-center max-w-xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tight mb-4">

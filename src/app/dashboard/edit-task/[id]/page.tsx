@@ -134,16 +134,6 @@ const EditTaskStatusPage = () => {
                 </button>
               ))}
             </div>
-
-            {/* Warning Box */}
-            <div className="mt-8 p-4 bg-slate-900/30 border border-slate-800 rounded-2xl flex items-start gap-4">
-              <RiInformationLine className="text-primary mt-1" size={20} />
-              <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
-                Changing status will trigger automated notifications for
-                workspace members. Metadata, project assignment, and
-                descriptions are locked for this session.
-              </p>
-            </div>
           </div>
 
           {/* Action Buttons */}
