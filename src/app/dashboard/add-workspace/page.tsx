@@ -10,6 +10,8 @@ import {
   RiShieldUserLine,
   RiArrowRightLine,
   RiBuilding3Line,
+  RiAdminLine,
+  RiUserLine,
 } from "react-icons/ri";
 
 const AddWorkspacePage = () => {
@@ -17,20 +19,20 @@ const AddWorkspacePage = () => {
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [emailInput, setEmailInput] = useState("");
-  const [members, setMembers] = useState<{ userId: string; role: string }[]>(
-    [],
-  );
+  const [roleInput, setRoleInput] = useState("member");
+  // Updated state to handle the new member structure
+  const [members, setMembers] = useState<{ email: string; role: string }[]>([]);
 
-  // Add a member to the local state list
   const addMember = () => {
-    if (emailInput && !members.find((m) => m.userId === emailInput)) {
-      setMembers([...members, { userId: emailInput, role: "member" }]);
+    if (emailInput && !members.find((m) => m.email === emailInput)) {
+      setMembers([...members, { email: emailInput, role: roleInput }]);
       setEmailInput("");
+      setRoleInput("member"); // Reset role to default
     }
   };
 
-  const removeMember = (id: string) => {
-    setMembers(members.filter((m) => m.userId !== id));
+  const removeMember = (email: string) => {
+    setMembers(members.filter((m) => m.email !== email));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,13 +40,11 @@ const AddWorkspacePage = () => {
     setLoading(true);
 
     try {
+      // This API will now create the workspace AND the invitations
       const response = await fetch("/api/add-workspace", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          members, // Your schema handles the ownerId on the backend via session
-        }),
+        body: JSON.stringify({ name, invitedMembers: members }),
       });
 
       if (response.ok) {
@@ -71,11 +71,11 @@ const AddWorkspacePage = () => {
             <div className="inline-flex p-4 bg-primary/10 text-primary rounded-2xl mb-4">
               <RiHomeSmile2Line size={32} />
             </div>
-            <h1 className="text-3xl font-black tracking-tight">
-              New Workspace
+            <h1 className="text-3xl font-black tracking-tight uppercase italic">
+              New_Workspace
             </h1>
-            <p className="text-base-content/50 mt-2">
-              The foundation of your team's productivity
+            <p className="text-base-content/50 mt-2 font-mono text-xs uppercase tracking-widest">
+              Team Collaboration Hub
             </p>
           </div>
 
@@ -83,7 +83,7 @@ const AddWorkspacePage = () => {
             {/* Workspace Name */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-bold uppercase tracking-wider text-xs text-base-content/50">
+                <span className="label-text font-black uppercase tracking-[0.2em] text-[10px] text-base-content/40">
                   Workspace Name
                 </span>
               </label>
@@ -91,8 +91,8 @@ const AddWorkspacePage = () => {
                 <RiBuilding3Line className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" />
                 <input
                   type="text"
-                  placeholder="e.g. Acme Studio or Personal"
-                  className="input input-lg input-bordered w-full pl-12 focus:input-primary bg-base-200/30 font-medium"
+                  placeholder="e.g. GreeCir Creative"
+                  className="input input-lg input-bordered w-full pl-12 focus:input-primary bg-base-200/30 font-bold italic"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -103,51 +103,73 @@ const AddWorkspacePage = () => {
             {/* Members Section */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-bold uppercase tracking-wider text-xs text-base-content/50">
-                  Invite Members (Optional)
+                <span className="label-text font-black uppercase tracking-[0.2em] text-[10px] text-base-content/40">
+                  Invite Team Members
                 </span>
               </label>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="colleague@example.com"
-                  className="input input-bordered flex-1 bg-base-200/30"
-                  value={emailInput}
-                  onChange={(e) => setEmailInput(e.target.value)}
-                  onKeyDown={(e) =>
-                    e.key === "Enter" && (e.preventDefault(), addMember())
-                  }
-                />
+              <div className="flex flex-col gap-3 p-4 bg-base-200/50 rounded-2xl border border-base-300/50">
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    placeholder="teammate@email.com"
+                    className="input input-bordered flex-1 bg-base-100"
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.target.value)}
+                  />
+                  <select
+                    className="select select-bordered bg-base-100 font-bold text-xs uppercase"
+                    value={roleInput}
+                    onChange={(e) => setRoleInput(e.target.value)}
+                  >
+                    <option value="member">Member</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
                 <button
                   type="button"
                   onClick={addMember}
-                  className="btn btn-primary px-6"
+                  className="btn btn-primary btn-sm h-10 w-full gap-2 font-black uppercase tracking-widest text-[10px]"
                 >
-                  Invite
+                  <RiUserAddLine /> Add_To_Invite_List
                 </button>
               </div>
 
               {/* Member List Chips */}
-              <div className="flex flex-wrap gap-2 mt-4">
+              <div className="flex flex-col gap-2 mt-6">
                 <AnimatePresence>
                   {members.map((member) => (
                     <motion.div
-                      key={member.userId}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      className="badge badge-lg py-5 px-4 gap-2 bg-base-200 border-base-300"
+                      key={member.email}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      className="flex items-center justify-between p-3 bg-base-100 border border-base-300 rounded-xl"
                     >
-                      <RiShieldUserLine className="text-primary" />
-                      <span className="text-xs font-medium">
-                        {member.userId}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`p-2 rounded-lg ${member.role === "admin" ? "bg-primary/10 text-primary" : "bg-base-300 text-base-content/50"}`}
+                        >
+                          {member.role === "admin" ? (
+                            <RiAdminLine size={16} />
+                          ) : (
+                            <RiUserLine size={16} />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold truncate max-w-[150px]">
+                            {member.email}
+                          </p>
+                          <p className="text-[9px] uppercase font-black tracking-tighter opacity-40">
+                            {member.role}
+                          </p>
+                        </div>
+                      </div>
                       <button
                         type="button"
-                        onClick={() => removeMember(member.userId)}
-                        className="hover:text-error transition-colors"
+                        onClick={() => removeMember(member.email)}
+                        className="btn btn-ghost btn-xs text-error hover:bg-error/10"
                       >
-                        <RiCloseLine size={16} />
+                        <RiCloseLine size={18} />
                       </button>
                     </motion.div>
                   ))}
@@ -156,22 +178,26 @@ const AddWorkspacePage = () => {
             </div>
           </div>
 
-          <div className="divider my-8 opacity-50"></div>
+          <div className="divider my-8 opacity-50 font-mono text-[9px] uppercase tracking-[0.3em]">
+            Execution
+          </div>
 
           {/* Submission */}
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <p className="text-[11px] text-base-content/40 max-w-[200px] text-center sm:text-left leading-tight">
-              You will be automatically assigned as the <b>Admin</b> of this
-              workspace.
-            </p>
+          <div className="flex flex-col gap-4">
             <button
               type="submit"
-              className={`btn btn-primary btn-wide sm:btn-md h-12 gap-2 shadow-lg shadow-primary/20 ${loading ? "loading" : ""}`}
+              className={`btn btn-primary h-14 rounded-2xl gap-3 shadow-xl shadow-primary/20 font-black uppercase tracking-widest italic ${loading ? "loading" : ""}`}
               disabled={loading || !name}
             >
-              {loading ? "Initializing..." : "Create Workspace"}
+              {loading ? "Allocating_Resources..." : "Initialize_Workspace"}
               {!loading && <RiArrowRightLine />}
             </button>
+            <p className="text-[10px] text-center font-mono text-base-content/30 uppercase tracking-tighter leading-tight">
+              You will be assigned as{" "}
+              <span className="text-primary font-bold">Root_Admin</span>.
+              <br />
+              Invited members will receive a notification to join.
+            </p>
           </div>
         </form>
       </motion.div>

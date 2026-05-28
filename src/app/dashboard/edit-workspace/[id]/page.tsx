@@ -11,6 +11,7 @@ import {
   RiShieldCheckLine,
   RiAdminLine,
   RiUser3Line,
+  RiExchangeLine,
 } from "react-icons/ri";
 import axios from "axios";
 
@@ -51,11 +52,27 @@ const EditWorkspacePage = () => {
     if (id) loadWorkspaceConfig();
   }, [id]);
 
+  // Handle Role Toggling locally
+  const toggleRole = (userId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      members: prev.members.map((m) =>
+        m.userId === userId
+          ? { ...m, role: m.role === "admin" ? "member" : "admin" }
+          : m,
+      ),
+    }));
+  };
+
   const handleConfigCommit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsUpdating(true);
     try {
-      await axios.patch(`/api/update-workspace/${id}`, { name: formData.name });
+      // Now sending both Name and the updated Members array
+      await axios.patch(`/api/update-workspace/${id}`, {
+        name: formData.name,
+        members: formData.members,
+      });
       router.push("/dashboard/workspaces");
     } catch (err) {
       console.error("Configuration compile error:", err);
@@ -96,9 +113,9 @@ const EditWorkspacePage = () => {
           onSubmit={handleConfigCommit}
           className="grid lg:grid-cols-3 gap-8"
         >
-          {/* Main Scope Parameters Panel */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-[#0b0b0b] border border-slate-900 rounded-[2rem] p-8 lg:p-10 shadow-xl space-y-8">
+            <div className="bg-[#0b0b0b] border border-slate-900 rounded-[2rem] p-8 lg:p-10 shadow-xl space-y-10">
+              {/* Workspace Identity */}
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/80">
                   Cluster Identity Name
@@ -106,7 +123,7 @@ const EditWorkspacePage = () => {
                 <input
                   type="text"
                   required
-                  className="w-full bg-transparent border-none text-4xl font-bold placeholder:text-slate-800 focus:ring-0 p-0 text-white"
+                  className="w-full p-4 bg-transparent text-2xl font-bold placeholder:text-slate-800 focus:ring-0 border border-slate-800 rounded-full text-white italic"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -114,48 +131,54 @@ const EditWorkspacePage = () => {
                 />
               </div>
 
-              {/* Members Array Display Module */}
-              <div className="space-y-4 pt-4 border-t border-slate-900/60">
-                <div className="flex items-center gap-2">
-                  <RiTeamLine size={16} className="text-slate-500" />
-                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">
-                    Environment_Operators ({formData.members.length})
-                  </h3>
+              {/* Members/Team Management */}
+              <div className="space-y-4 pt-8 border-t border-slate-900/60">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <RiTeamLine size={16} className="text-slate-500" />
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">
+                      Team_Operators ({formData.members.length})
+                    </h3>
+                  </div>
                 </div>
 
-                <div className="space-y-2 max-h-[280px] overflow-y-auto pr-2">
-                  {formData.members.map((member, idx) => (
+                <div className="grid gap-3">
+                  {formData.members.map((member) => (
                     <div
-                      key={idx}
-                      className="flex items-center justify-between p-4 bg-slate-950/60 border border-slate-900/80 rounded-xl"
+                      key={member.userId}
+                      className="flex items-center justify-between p-4 bg-slate-950/40 border border-slate-900 rounded-2xl group transition-all hover:border-slate-700"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-slate-500 border border-slate-800">
                           {member.role === "admin" ? (
-                            <RiAdminLine size={14} />
+                            <RiAdminLine size={18} />
                           ) : (
-                            <RiUser3Line size={14} />
+                            <RiUser3Line size={18} />
                           )}
                         </div>
                         <div>
-                          <p className="text-xs font-mono text-slate-300 font-bold">
-                            UID_{member.userId.slice(-6)}
-                          </p>
-                          <p className="text-[9px] font-mono text-slate-600 truncate max-w-[180px]">
+                          <p className="text-xs font-bold text-slate-200">
                             {member.userId}
+                          </p>
+                          <p className="text-[9px] font-mono text-slate-600 uppercase tracking-tighter">
+                            Verified_Node_Member
                           </p>
                         </div>
                       </div>
 
-                      <span
-                        className={`text-[9px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider border ${
+                      {/* Interactive Role Badge */}
+                      <button
+                        type="button"
+                        onClick={() => toggleRole(member.userId)}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all ${
                           member.role === "admin"
-                            ? "bg-primary/5 border-primary/20 text-primary"
-                            : "bg-slate-900 border-slate-800 text-slate-500"
+                            ? "bg-primary/10 border-primary/30 text-primary"
+                            : "bg-slate-900 border-slate-800 text-slate-500 hover:text-white"
                         }`}
                       >
                         {member.role}
-                      </span>
+                        <RiExchangeLine className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -169,24 +192,22 @@ const EditWorkspacePage = () => {
               <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 block">
                 System_Status
               </label>
-
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 text-xs text-slate-400 bg-slate-950 border border-slate-900 p-4 rounded-xl">
-                  <RiShieldCheckLine
-                    size={20}
-                    className="text-emerald-500 shrink-0"
-                  />
-                  <div>
-                    <p className="font-bold text-white">Encryption Lock</p>
-                    <p className="text-[10px] text-slate-600 font-mono">
-                      Isolated Node State
-                    </p>
-                  </div>
+              <div className="flex items-center gap-3 text-xs text-slate-400 bg-slate-950 border border-slate-900 p-4 rounded-xl">
+                <RiShieldCheckLine
+                  size={20}
+                  className="text-emerald-500 shrink-0"
+                />
+                <div>
+                  <p className="font-bold text-white uppercase italic text-[10px]">
+                    Permission_Sync
+                  </p>
+                  <p className="text-[10px] text-slate-600 font-mono">
+                    RBAC Protocol Active
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Form Submission Action Row */}
             <div className="sticky top-10 flex flex-col gap-3">
               <button
                 type="submit"
@@ -197,8 +218,7 @@ const EditWorkspacePage = () => {
                   <span className="loading loading-spinner"></span>
                 ) : (
                   <>
-                    <RiSaveLine size={18} />
-                    Commit_Cluster_State
+                    <RiSaveLine size={18} /> Commit_Recalibration
                   </>
                 )}
               </button>

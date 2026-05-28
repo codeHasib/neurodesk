@@ -95,7 +95,7 @@ const AllWorkspacesPage = () => {
             </p>
           </div>
           <button
-            onClick={() => router.push("/workspaces/new")}
+            onClick={() => router.push("/dashboard/add-workspace")}
             className="btn btn-primary h-14 rounded-2xl text-xs font-black tracking-widest px-8 shadow-xl shadow-primary/10 transition-all hover:scale-[1.01]"
           >
             <RiAddLine size={20} /> Initialize_Workspace

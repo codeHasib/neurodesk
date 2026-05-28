@@ -25,6 +25,7 @@ import {
 } from "react-icons/ri";
 import ThemeToggle from "../ui/ThemeToggle";
 import { AnimatePresence, motion } from "motion/react";
+import InvitationCenter from "../InvitationCenter";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -119,6 +120,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
               ⌘ K
             </kbd>
           </button>
+          <div className="flex justify-start items-center gap-3 pt-5">
+            <InvitationCenter></InvitationCenter>
+          </div>
         </div>
 
         {/* Navigation Items */}
@@ -184,57 +188,13 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         </div>
 
         {/* Mobile Dropdown Avatar Menu */}
-        {/* <div className="flex justify-center items-center gap-2">
-          <div>
-            <ThemeToggle></ThemeToggle>
-          </div>
-          <div className="dropdown dropdown-end">
-            <div
-              tabIndex={0}
-              role="button"
-              className="avatar placeholder btn btn-ghost btn-circle btn-sm"
-            >
-              <button
-                disabled={isPending}
-                className="bg-neutral text-neutral-content rounded-full h-7 w-10 flex justify-center items-center"
-              >
-                <span className="text-xs">
-                  {isPending ? (
-                    <span className="loading loading-spinner text-secondary"></span>
-                  ) : (
-                    data?.user.name[0].toUpperCase()
-                  )}
-                </span>
-              </button>
-            </div>
-            <ul
-              tabIndex={0}
-              className="mt-3 z-[50] p-2 shadow-xl menu menu-sm dropdown-content bg-base-100 rounded-xl w-52 border border-base-300"
-            >
-              <li className="menu-title text-xs font-bold text-base-content/40 uppercase">
-                HI, {data?.user.name}
-              </li>
-              {menuItems.map((item) => (
-                <li key={item.name}>
-                  <Link href={item.href}>{item.name}</Link>
-                </li>
-              ))}
-              <div className="divider my-1"></div>
-              <li>
-                <Link href="/settings">Settings</Link>
-              </li>
-              <li>
-                <button onClick={handleSignOut} className="text-error">
-                  Logout
-                </button>
-              </li>
-            </ul>
-          </div>
-        </div> */}
         <div className="flex justify-center items-center gap-4">
           {/* Theme Toggle Wrapper */}
           <div className="hover:scale-105 transition-transform duration-200">
             <ThemeToggle />
+          </div>
+          <div>
+            <InvitationCenter></InvitationCenter>
           </div>
 
           {/* Interactive Dropdown Module */}
