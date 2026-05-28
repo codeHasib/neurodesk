@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import { authClient, useSession } from "@/lib/auth-client";
 import {
   RiHomeOfficeLine,
@@ -89,6 +89,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     await authClient.signOut({
       fetchOptions: { onSuccess: () => router.push("/") },
     });
+    redirect("/"); // Ensure redirection happens even if onSuccess callback is missed
   };
 
   return (
@@ -106,6 +107,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           </div>
         </div>
         <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
+          <div className="py-5">
+            <InvitationCenter></InvitationCenter>
+          </div>
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
             return (

@@ -26,6 +26,13 @@ export default function LandingPage() {
     }
   } else {
     // Show loading state or skeleton
+    return (
+      <>
+        <div className="flex items-center justify-center h-screen">
+          <span className="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+      </>
+    );
   }
 
   // Quick portfolio trick: Log them into a guest state or push straight to dashboard
