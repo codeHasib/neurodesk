@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 const SignUpPage = () => {
   const [email, setEmail] = useState("");
@@ -35,6 +36,9 @@ const SignUpPage = () => {
         },
       },
     );
+
+    // Redirect to sign in page after successful sign up
+    redirect("/auth/signin");
   };
 
   return (
