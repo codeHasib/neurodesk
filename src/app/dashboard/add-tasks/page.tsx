@@ -1,19 +1,18 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
   RiAddLine,
-  RiText,
   RiFolderLine,
   RiLayout4Line,
   RiArrowLeftLine,
   RiCheckboxCircleLine,
   RiFlashlightLine,
+  RiUserReceived2Line,
 } from "react-icons/ri";
 import axios from "axios";
-import { authClient } from "@/lib/auth-client";
 
 const AddTaskPage = () => {
   const router = useRouter();
@@ -22,12 +21,14 @@ const AddTaskPage = () => {
   const [workSpaces, setWorkSpaces] = useState<any[]>([]);
   const [allProjects, setAllProjects] = useState<any[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<any[]>([]);
+  const [currentMembers, setCurrentMembers] = useState<any[]>([]); // New State
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     projectId: "",
     workSpaceId: "",
+    assignedTo: "", // New Field
     status: "todo",
   });
 
@@ -38,7 +39,7 @@ const AddTaskPage = () => {
           axios.get("/api/get-workspace"),
           axios.get("/api/get-project"),
         ]);
-        setWorkSpaces(wsRes.data);
+        setWorkSpaces(wsRes.data?.workspaces);
         setAllProjects(projRes.data);
       } catch (err) {
         console.error("Context fetch failed", err);
@@ -50,8 +51,15 @@ const AddTaskPage = () => {
   }, []);
 
   const handleWorkspaceChange = (wsId: string) => {
-    setFormData({ ...formData, workSpaceId: wsId, projectId: "" });
+    const selectedWs = workSpaces.find((ws) => ws._id === wsId);
+    setFormData({
+      ...formData,
+      workSpaceId: wsId,
+      projectId: "",
+      assignedTo: "",
+    });
     setFilteredProjects(allProjects.filter((p) => p.workSpaceId === wsId));
+    setCurrentMembers(selectedWs?.members || []); // Update available members
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -74,7 +82,6 @@ const AddTaskPage = () => {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         className="max-w-4xl mx-auto"
       >
-        {/* Navigation */}
         <div className="flex items-center justify-between mb-12">
           <button
             onClick={() => router.back()}
@@ -90,15 +97,12 @@ const AddTaskPage = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="relative group">
-          {/* Glowing Aura Effect */}
           <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-[2rem] blur-2xl opacity-20 group-focus-within:opacity-40 transition-opacity duration-700"></div>
 
           <div className="relative bg-[#0d0d0d] border border-slate-800 rounded-[2rem] overflow-hidden shadow-2xl">
-            {/* Top Bar Decoration */}
             <div className="h-1 bg-gradient-to-r from-primary via-secondary to-primary opacity-50"></div>
 
             <div className="p-8 lg:p-12 space-y-10">
-              {/* Header */}
               <div className="flex items-start justify-between border-b border-slate-800/50 pb-8">
                 <div>
                   <h1 className="text-4xl font-black italic tracking-tighter text-white">
@@ -113,9 +117,7 @@ const AddTaskPage = () => {
                 </div>
               </div>
 
-              {/* Input Core */}
               <div className="space-y-8">
-                {/* Title Section */}
                 <div className="space-y-3">
                   <label className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/80 flex items-center gap-2">
                     <RiCheckboxCircleLine /> Subject
@@ -132,7 +134,6 @@ const AddTaskPage = () => {
                   />
                 </div>
 
-                {/* Grid Selectors */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
                     <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">
@@ -191,7 +192,31 @@ const AddTaskPage = () => {
                   </div>
                 </div>
 
-                {/* Description - The "Monospace" Look */}
+                {/* NEW ASSIGNEE SELECTOR */}
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">
+                    Assign Agent
+                  </label>
+                  <div className="relative group/select">
+                    <RiUserReceived2Line className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within/select:text-primary transition-colors" />
+                    <select
+                      className="select w-full pl-12 bg-slate-900/50 border-slate-800 focus:border-primary rounded-xl text-sm font-semibold h-14"
+                      value={formData.assignedTo}
+                      onChange={(e) =>
+                        setFormData({ ...formData, assignedTo: e.target.value })
+                      }
+                      disabled={!formData.workSpaceId}
+                    >
+                      <option value="">Unassigned (Backlog)</option>
+                      {currentMembers.map((member) => (
+                        <option key={member.userId} value={member.userId}>
+                          {member.email} ({member.role})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
                 <div className="space-y-3">
                   <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">
                     Documentation
@@ -207,7 +232,6 @@ const AddTaskPage = () => {
                   />
                 </div>
 
-                {/* Status Toggles */}
                 <div className="space-y-4">
                   <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600">
                     Execution Phase
@@ -231,7 +255,6 @@ const AddTaskPage = () => {
                 </div>
               </div>
 
-              {/* Footer Actions */}
               <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-800/50">
                 <button
                   type="submit"

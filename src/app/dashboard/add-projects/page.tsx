@@ -62,7 +62,7 @@ const AddProjectPage = () => {
     const fetchWorkspaces = async () => {
       try {
         const response = await axios.get("/api/get-workspace");
-        setWorkSpaces(response.data);
+        setWorkSpaces(response.data.workspaces);
       } catch (error) {
         console.error("Error fetching workspaces:", error);
       }

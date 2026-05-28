@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   RiAddLine,
   RiEditLine,
@@ -13,9 +13,16 @@ import {
   RiTerminalBoxLine,
   RiCheckboxBlankCircleLine,
   RiCheckboxCircleLine,
+  RiUserLine,
 } from "react-icons/ri";
 import axios from "axios";
 import ConfirmDeleteModal from "@/components/modal/ConfimDeleteModal";
+
+// Adjusted to match your schema's "members" array structure
+interface TaskMember {
+  userId: string;
+  role: "admin" | "member";
+}
 
 interface Task {
   _id: string;
@@ -23,7 +30,9 @@ interface Task {
   description: string;
   workSpaceId: string;
   projectId: string;
+  ownerId: string; // The creator
   status: "todo" | "in-progress" | "review" | "completed";
+  members: TaskMember[]; // Matching your schema provided
 }
 
 interface Workspace {
@@ -54,12 +63,10 @@ const AllTasksPage = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
-  // Core Datasets
   const [tasks, setTasks] = useState<Task[]>([]);
   const [workspaces, setWorkspaces] = useState<Record<string, string>>({});
   const [projects, setProjects] = useState<Record<string, string>>({});
 
-  // Client Filter States
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
@@ -70,6 +77,7 @@ const AllTasksPage = () => {
     const fetchMatrixData = async () => {
       try {
         setLoading(true);
+        // Ensure these endpoints are now returning tasks using the $or [ownerId, members.userId] logic
         const [taskRes, wsRes, projRes] = await Promise.all([
           axios.get<Task[]>("/api/get-task"),
           axios.get<Workspace[]>("/api/get-workspace"),
@@ -78,8 +86,7 @@ const AllTasksPage = () => {
 
         setTasks(taskRes.data || []);
 
-        // Flatten workspaces & projects arrays into hash maps for O(1) rendering lookups
-        const wsMap = (wsRes.data || []).reduce(
+        const wsMap = (wsRes.data?.workspaces || []).reduce(
           (acc, ws) => ({ ...acc, [ws._id]: ws.name }),
           {},
         );
@@ -102,20 +109,12 @@ const AllTasksPage = () => {
 
   const handleDeleteExecute = async () => {
     if (!deleteTarget) return;
-
     try {
       setIsDeleting(true);
-
-      // Fire DELETE request to your task endpoint
-      console.log(deleteTarget._id);
       await axios.delete(`/api/delete-task/${deleteTarget._id}`);
-
-      // Update local state smoothly without an entire page reload
       setTasks((prevTasks) =>
         prevTasks.filter((t) => t._id !== deleteTarget._id),
       );
-
-      // Close modal
       setDeleteTarget(null);
     } catch (err) {
       console.error("Failed to execute purge blueprint:", err);
@@ -124,7 +123,6 @@ const AllTasksPage = () => {
     }
   };
 
-  // Filtering Logic Execution
   const filteredTasks = tasks.filter((task) => {
     const matchesSearch =
       task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -161,7 +159,7 @@ const AllTasksPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-3black">
+      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-3">
         <span className="loading loading-ring loading-lg text-primary"></span>
         <p className="text-[10px] font-mono text-slate-500 uppercase tracking-[0.2em]">
           Syncing operational matrix...
@@ -176,7 +174,7 @@ const AllTasksPage = () => {
         {/* Header Block */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-900 pb-6">
           <div>
-            <h1 className="text-3xl font-black italic tracking-tighter  uppercase">
+            <h1 className="text-3xl font-black italic tracking-tighter uppercase">
               Execution_Queue
             </h1>
             <p className="text-slate-500 text-xs font-mono tracking-wider mt-1">
@@ -193,7 +191,6 @@ const AllTasksPage = () => {
 
         {/* Operational Filters Bar */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#0d0d0d] p-3 border border-slate-900 rounded-xl">
-          {/* Search */}
           <div className="relative flex-1">
             <RiSearchLine className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" />
             <input
@@ -205,7 +202,6 @@ const AllTasksPage = () => {
             />
           </div>
 
-          {/* Status Segment Filtering Controls */}
           <div className="md:col-span-2 flex flex-wrap gap-1.5 items-center justify-start md:justify-end">
             {["all", "todo", "in-progress", "review", "completed"].map(
               (tab) => (
@@ -244,10 +240,8 @@ const AllTasksPage = () => {
                     exit={{ opacity: 0, scale: 0.98 }}
                     className="group bg-[#0d0d0d] border border-slate-900 hover:border-slate-800 transition-all rounded-xl overflow-hidden p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
                   >
-                    {/* Left: Metadata & Context Block */}
                     <div className="space-y-3 flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-3">
-                        {/* Task Phase Indicator */}
                         <div
                           className={`flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono border rounded-md uppercase font-black tracking-wider ${style.bg} ${style.text}`}
                         >
@@ -259,7 +253,6 @@ const AllTasksPage = () => {
                           {task.status.replace("-", " ")}
                         </div>
 
-                        {/* Node Architecture Trackers */}
                         <div className="flex items-center gap-1 text-[10px] font-mono text-slate-600">
                           <RiLayout4Line size={12} />
                           <span className="truncate max-w-[120px]">
@@ -274,7 +267,6 @@ const AllTasksPage = () => {
                         </div>
                       </div>
 
-                      {/* Content Execution Identity */}
                       <div className="space-y-1">
                         <h3 className="text-base font-bold text-white group-hover:text-primary transition-colors tracking-tight">
                           {task.title}
@@ -283,9 +275,20 @@ const AllTasksPage = () => {
                           {task.description}
                         </p>
                       </div>
+
+                      {/* Displaying Assigned Members based on userId schema */}
+                      {task.members && task.members.length > 0 && (
+                        <div className="flex items-center gap-3 pt-2">
+                          <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-900/50 rounded-md border border-slate-800">
+                            <RiUserLine size={10} className="text-primary" />
+                            <span className="text-[9px] font-mono text-slate-400 uppercase tracking-widest">
+                              Assigned Units: {task.members.length}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Right: Surgical Control Directives */}
                     <div className="flex items-center gap-2 w-full md:w-auto justify-end border-t border-slate-900 md:border-none pt-4 md:pt-0 shrink-0">
                       <button
                         onClick={() =>
@@ -296,8 +299,9 @@ const AllTasksPage = () => {
                       >
                         <RiEditLine size={16} />
                       </button>
+
                       <button
-                        onClick={() => setDeleteTarget(task)} // Updated pointer
+                        onClick={() => setDeleteTarget(task)}
                         className="btn bg-slate-900/40 border border-slate-800 text-slate-500 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/20 h-10 w-10 p-0 rounded-lg transition-all"
                         title="Purge Task Entity"
                       >
@@ -309,7 +313,6 @@ const AllTasksPage = () => {
               })}
             </motion.div>
           ) : (
-            /* Empty Queue Scenario */
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

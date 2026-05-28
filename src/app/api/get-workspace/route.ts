@@ -1,11 +1,24 @@
 import { getWorkspace } from "@/actions/getWorkSpace";
-import { NextResponse } from "next/server";
+import { verifyToken } from "@/lib/api-verify";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export const GET = async () => {
   try {
-    const workSpaces = await getWorkspace();
-    return NextResponse.json(workSpaces);
+    const { token } = await auth.api.getToken({ headers: await headers() });
+    const user = await verifyToken(token);
+
+    // This action (which we updated earlier) now finds workspaces
+    // where the user is either the owner OR a member.
+    const workspaces = await getWorkspace();
+
+    // We return an object so the frontend can distinguish roles
+    return Response.json({
+      workspaces: workspaces || [],
+      userId: user.id,
+    });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("GET_WORKSPACE_ROUTE_ERROR:", error);
+    return new Response("Unauthorized", { status: 401 });
   }
 };

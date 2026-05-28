@@ -48,8 +48,11 @@ const AllProjectsPage = () => {
           axios.get<Workspace[]>("/api/get-workspace"),
         ]);
 
+        // console.log(projRes);
+        console.log(wsRes.data?.workspaces);
+
         setProjects(projRes.data || []);
-        const wsMap = (wsRes.data || []).reduce(
+        const wsMap = (wsRes.data?.workspaces || []).reduce(
           (acc, ws) => ({ ...acc, [ws._id]: ws.name }),
           {},
         );
