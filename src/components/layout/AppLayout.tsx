@@ -59,7 +59,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     },
     {
       name: "AI Planner",
-      href: "/planner",
+      href: "/dashboard/ai-planner",
       icon: <RiSparklingLine size={22} />,
     },
     {
