@@ -9,11 +9,19 @@ import {
   RiGroupLine,
   RiInboxArchiveLine,
 } from "react-icons/ri";
-import { useInvitations } from "@/hooks/useInvitations";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
-// 1. Portal Helper to escape parent stacking contexts
+// Explicit Interface for TS Build
+interface Invitation {
+  _id: string;
+  role: string;
+  workspaceId?: {
+    name: string;
+  };
+  [key: string]: any; 
+}
+
 const Portal = ({ children }: { children: React.ReactNode }) => {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -24,7 +32,8 @@ const Portal = ({ children }: { children: React.ReactNode }) => {
 };
 
 const InvitationCenter = () => {
-  const { invitations, setInvitations } = useInvitations();
+  // Explicitly typed state to avoid 'never' errors
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
@@ -33,12 +42,11 @@ const InvitationCenter = () => {
     try {
       if (action === "accept") {
         await axios.post("/api/invitations/accept", { invitationId: id });
-        toast.success("Access Granted. Workspace Initialized.");
+        toast.success("Access Granted.");
       } else {
         await axios.delete(`/api/invitations/${id}`);
-        toast.error("Invitation Terminated.");
+        toast.error("Terminated.");
       }
-      // Optimistic UI Update
       setInvitations((prev) => prev.filter((inv) => inv._id !== id));
     } catch (err) {
       toast.error("Operation Failed.");
@@ -49,12 +57,11 @@ const InvitationCenter = () => {
 
   return (
     <div className="relative">
-      {/* Trigger Button - Stays in the Navbar flow */}
       <button
         onClick={() => setIsModalOpen(true)}
         className="relative p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-primary transition-all group"
       >
-        <span className="flex justify-start items-center gap-2  font-bold text-slate-400 px-4">
+        <span className="flex justify-start items-center gap-2 font-bold text-slate-400 px-4">
           <RiNotification3Line
             size={20}
             className="text-slate-400 group-hover:text-primary transition-colors"
@@ -71,43 +78,32 @@ const InvitationCenter = () => {
         )}
       </button>
 
-      {/* Modal - Teleported to document.body */}
       <Portal>
         <AnimatePresence>
           {isModalOpen && (
-            <div className="fixed inset-0 z-[999999]">
+            <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
               {/* Backdrop */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setIsModalOpen(false)}
-                className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                className="absolute inset-0 bg-black/80 backdrop-blur-md"
               />
 
-              {/* Content Card */}
+              {/* Content Card - Fixed duplicate 'y' keys */}
               <motion.div
-                initial={{
-                  opacity: 0,
-                  scale: 0.9,
-                  y: 20,
-                  x: "-50%",
-                  y: "-50%",
-                }}
-                animate={{ opacity: 1, scale: 1, y: "-50%", x: "-50%" }}
-                exit={{ opacity: 0, scale: 0.9, y: 20, x: "-50%", y: "-50%" }}
-                className="absolute left-1/2 top-1/2 w-full max-w-md p-4"
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                className="relative w-full max-w-md"
               >
-                <div className="bg-[#0c0c0c] border border-slate-800 rounded-[2.5rem] shadow-2xl overflow-hidden ring-1 ring-white/5">
-                  {/* Header */}
-                  <div className="p-8 border-b border-slate-900 flex justify-between items-center bg-slate-950/50">
+                <div className="bg-[#0c0c0c] border border-slate-800 rounded-[2rem] shadow-2xl overflow-hidden">
+                  <div className="p-6 border-b border-slate-900 flex justify-between items-center bg-slate-950/50">
                     <div>
-                      <h2 className="text-xl font-black italic uppercase tracking-tighter text-white">
+                      <h2 className="text-lg font-black italic uppercase tracking-tighter text-white">
                         Incoming_Invites
                       </h2>
-                      <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-1">
-                        Pending Connection Requests
-                      </p>
                     </div>
                     <button
                       onClick={() => setIsModalOpen(false)}
@@ -117,24 +113,18 @@ const InvitationCenter = () => {
                     </button>
                   </div>
 
-                  {/* List Container */}
                   <div className="max-h-[400px] overflow-y-auto p-6 space-y-4 custom-scrollbar bg-black/20">
                     {invitations.length === 0 ? (
                       <div className="py-12 flex flex-col items-center justify-center text-center opacity-30">
-                        <RiInboxArchiveLine
-                          size={48}
-                          className="mb-4 text-primary"
-                        />
-                        <p className="text-xs font-mono uppercase tracking-[0.2em]">
-                          Signal_Silent
-                        </p>
+                        <RiInboxArchiveLine size={48} className="mb-4 text-primary" />
+                        <p className="text-xs font-mono uppercase tracking-[0.2em]">Signal_Silent</p>
                       </div>
                     ) : (
-                      invitations.map((invite: any) => (
+                      invitations.map((invite) => (
                         <motion.div
                           layout
                           key={invite._id}
-                          className="p-5 bg-slate-950/50 border border-slate-900 rounded-2xl flex flex-col gap-4 group hover:border-slate-700 transition-colors"
+                          className="p-4 bg-slate-950/50 border border-slate-900 rounded-2xl flex flex-col gap-4 group hover:border-slate-700 transition-colors"
                         >
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
@@ -145,7 +135,7 @@ const InvitationCenter = () => {
                                 {invite.workspaceId?.name || "Shared Workspace"}
                               </p>
                               <p className="text-[9px] font-mono text-slate-500 uppercase">
-                                Access_Level: {invite.role}
+                                Access: {invite.role}
                               </p>
                             </div>
                           </div>
@@ -154,18 +144,18 @@ const InvitationCenter = () => {
                             <button
                               disabled={!!processingId}
                               onClick={() => handleAction(invite._id, "accept")}
-                              className="flex-1 btn btn-sm h-11 bg-primary text-black hover:bg-primary/90 border-none rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
+                              className="flex-1 h-10 bg-primary text-black hover:bg-primary/90 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
                             >
                               {processingId === invite._id ? (
-                                <span className="loading loading-spinner loading-xs"></span>
+                                <span className="loading loading-spinner loading-xs text-black"></span>
                               ) : (
-                                "Accept_Join"
+                                "Accept"
                               )}
                             </button>
                             <button
                               disabled={!!processingId}
                               onClick={() => handleAction(invite._id, "reject")}
-                              className="p-3 bg-slate-900 text-slate-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all border border-slate-800"
+                              className="p-2 bg-slate-900 text-slate-500 hover:text-red-500 rounded-xl border border-slate-800"
                             >
                               <RiCloseLine size={20} />
                             </button>
@@ -173,13 +163,6 @@ const InvitationCenter = () => {
                         </motion.div>
                       ))
                     )}
-                  </div>
-
-                  {/* Footer */}
-                  <div className="p-4 bg-slate-950/80 border-t border-slate-900 text-center">
-                    <p className="text-[9px] font-mono text-slate-600 uppercase tracking-[0.3em]">
-                      Secure Node: {invitations.length} Active Signals
-                    </p>
                   </div>
                 </div>
               </motion.div>
