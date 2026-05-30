@@ -20,7 +20,6 @@ const AddWorkspacePage = () => {
   const [name, setName] = useState("");
   const [emailInput, setEmailInput] = useState("");
   const [roleInput, setRoleInput] = useState("member");
-  // Updated state to handle the new member structure
   const [members, setMembers] = useState<{ email: string; role: string }[]>([]);
 
   const addMember = () => {
@@ -108,16 +107,16 @@ const AddWorkspacePage = () => {
                 </span>
               </label>
               <div className="flex flex-col gap-3 p-4 bg-base-200/50 rounded-2xl border border-base-300/50">
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-col justify-center items-center">
                   <input
                     type="email"
                     placeholder="teammate@email.com"
-                    className="input input-bordered flex-1 bg-base-100"
+                    className="input input-bordered w-full bg-base-100 rounded-xl"
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                   />
                   <select
-                    className="select select-bordered bg-base-100 font-bold text-xs uppercase"
+                    className="select select-bordered bg-base-100 font-bold text-xs uppercase w-full rounded-xl"
                     value={roleInput}
                     onChange={(e) => setRoleInput(e.target.value)}
                   >
