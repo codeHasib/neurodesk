@@ -19,7 +19,7 @@ interface Invitation {
   workspaceId?: {
     name: string;
   };
-  [key: string]: any; 
+  [key: string]: unknown;
 }
 
 const Portal = ({ children }: { children: React.ReactNode }) => {
@@ -39,21 +39,39 @@ const InvitationCenter = () => {
 
   const handleAction = async (id: string, action: "accept" | "reject") => {
     setProcessingId(id);
+
+    // 1. Optimistic Update (Immediate UI feedback)
+    setInvitations((prev) => prev.filter((inv) => inv._id !== id));
+
     try {
       if (action === "accept") {
         await axios.post("/api/invitations/accept", { invitationId: id });
-        toast.success("Access Granted.");
       } else {
         await axios.delete(`/api/invitations/${id}`);
-        toast.error("Terminated.");
       }
-      setInvitations((prev) => prev.filter((inv) => inv._id !== id));
+      toast.success("Sync Complete.");
     } catch (err) {
-      toast.error("Operation Failed.");
+      // 2. Rollback (If the server call fails, re-fetch the real data)
+      toast.error("Operation failed, syncing...");
+      const response = await axios.get("/api/invitations/me");
+      setInvitations(response.data);
     } finally {
       setProcessingId(null);
     }
   };
+
+  useEffect(() => {
+    const fetchInvitations = async () => {
+      try {
+        const response = await axios.get("/api/invitations/me");
+        setInvitations(response.data);
+      } catch (error) {
+        toast.error("Failed to fetch invitations.");
+      }
+    };
+
+    fetchInvitations();
+  }, []);
 
   return (
     <div className="relative">
@@ -116,8 +134,13 @@ const InvitationCenter = () => {
                   <div className="max-h-[400px] overflow-y-auto p-6 space-y-4 custom-scrollbar bg-black/20">
                     {invitations.length === 0 ? (
                       <div className="py-12 flex flex-col items-center justify-center text-center opacity-30">
-                        <RiInboxArchiveLine size={48} className="mb-4 text-primary" />
-                        <p className="text-xs font-mono uppercase tracking-[0.2em]">Signal_Silent</p>
+                        <RiInboxArchiveLine
+                          size={48}
+                          className="mb-4 text-primary"
+                        />
+                        <p className="text-xs font-mono uppercase tracking-[0.2em]">
+                          Signal_Silent
+                        </p>
                       </div>
                     ) : (
                       invitations.map((invite) => (

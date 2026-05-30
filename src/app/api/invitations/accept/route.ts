@@ -1,6 +1,9 @@
-import { acceptInvitation } from "@/actions/acceptInvitation";
+import { acceptInvitation } from "@/actions/acceptInvitation"; // Or wherever your function is
 
-export const POST = async (req: Request) => {
-  const { invitationId } = await req.json();
-  return acceptInvitation(invitationId);
-};
+export async function POST(req: Request) {
+  const body = await req.json();
+  const { invitationId } = body;
+
+  // Call your existing function logic
+  return await acceptInvitation(invitationId);
+}
