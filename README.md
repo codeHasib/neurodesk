@@ -1,4 +1,8 @@
-﻿# 🧠 NeuroDesk (Beta)
+﻿<p align="center">
+  <img src="readme.png" alt="KinKeep Banner" width="100%">
+</p>
+
+# 🧠 NeuroDesk (Beta)
 
 An elite, full-stack **AI-augmented productivity workspace** engineered with a **Modern Utility aesthetic**.
 
@@ -10,7 +14,6 @@ Experience NeuroDesk live:
 
 🚀 **Production Deployment:**
 [NeuroDesk Live App](https://neurodesk-ten.vercel.app/?utm_source=chatgpt.com)
-
 
 ## ⚡ Core Features
 
