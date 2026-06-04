@@ -1,5 +1,5 @@
 ﻿<p align="center">
-  <img src="readme.png" alt="KinKeep Banner" width="100%">
+  <img src="readme.png" alt="Neuro Desk" width="100%">
 </p>
 
 # 🧠 NeuroDesk (Beta)
