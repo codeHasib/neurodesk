@@ -10,7 +10,7 @@ NeuroDesk unifies granular workspace orchestration, multi-layered project tracki
 
 ## 🌐 Live Demo
 
-Experience NeuroDesk live:
+Experience NeuroDesk live:-
 
 🚀 **Production Deployment:**
 [NeuroDesk Live App](https://neurodesk-ten.vercel.app/?utm_source=chatgpt.com)
